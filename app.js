@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 const signupRouter = require('./routes/signup')
 const userRouter = require("./routes/users")
+const adminRouter = require('./routes/admin')
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use('/users', usersRouter);
 app.use('/api/s_wallet.v1/auth', authRouter);
 app.use('/api/s_wallet.v1/signup', signupRouter);
 app.use('/api/s_wallet.v1/user', userRouter);
+app.use('/api/s_wallet.v1/admin', adminRouter);
 
 
 // catch 404 and forward to error handler

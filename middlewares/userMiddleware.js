@@ -1,5 +1,47 @@
-const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser } = require("../lib/user")
+const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers } = require("../lib/user");
 
+const findSimilarUsersMiddleware = async function (req, res, next) {
+    try {
+        const usersFound = await findSimilarUsers(req.query?.q);
+        res.status(200).json({data : usersFound})
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+const desableUserMiddleware = async function (req, res, next) {
+    try {
+        const user = await desableUser(req.query?.user_id);
+        if (user) {
+            res.status(200).json({
+                data : user
+            })
+        } else {
+            res.status(400).json({
+                message : "Compte introuvable"
+            })
+        }
+    } catch (error) {
+        next(error)
+    }
+}
+const enableUserMiddleware = async function (req, res, next) {
+    try {
+        const user = await enableUser(req.query?.user_id);
+        if (user) {
+            res.status(200).json({
+                data : user
+            })
+        } else {
+            res.status(400).json({
+                message : "Compte introuvable"
+            })
+        }
+    } catch (error) {
+        next(error)
+    }
+}
 
 const getUniqueUser = async function (req, res, next) {
     let user = null ;
@@ -79,5 +121,8 @@ module.exports =  {
    getUniqueUser,
    getAllUsers,
    updateUserMiddleware,
-   deleteUserMiddleware
+   deleteUserMiddleware,
+   desableUserMiddleware,
+   enableUserMiddleware,
+   findSimilarUsersMiddleware,
 }
