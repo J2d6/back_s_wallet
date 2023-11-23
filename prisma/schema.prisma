@@ -19,4 +19,20 @@ model User {
   soldeActuel Int @default(0)
   password String
   isActive Boolean @default(true)
+  cash_point Boolean 
+  receivers Transaction[] @relation("receive")
+  senders Transaction[] @relation("send")
+}
+
+model Transaction {
+  id_trasaction Int @default(autoincrement()) @id
+  receiver User @relation("receive", references: [user_id], fields: [receiver_id])
+  receiver_id Int
+  sender User @relation("send", references: [user_id], fields: [sender_id])
+  sender_id Int
+
+  amount Int
+  date_transaction DateTime @default(now())
+  type_transaction String
+
 }

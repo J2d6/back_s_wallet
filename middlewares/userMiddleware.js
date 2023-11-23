@@ -1,4 +1,18 @@
+const { getTransactionsById } = require("../lib/transactions");
 const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers } = require("../lib/user");
+
+
+const getTransactionsByIdMiddleware = async function (req, res, next) {
+    try {
+        const transactions = await getTransactionsById(req.query?.user_id);
+        res.status(200).json({
+            data : transactions
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 const findSimilarUsersMiddleware = async function (req, res, next) {
     try {
@@ -125,4 +139,5 @@ module.exports =  {
    desableUserMiddleware,
    enableUserMiddleware,
    findSimilarUsersMiddleware,
+   getTransactionsByIdMiddleware
 }
