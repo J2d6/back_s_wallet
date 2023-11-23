@@ -131,5 +131,5 @@ dist
 
 
 
-./prisma/migrations
+/prisma/migrations/*
 
