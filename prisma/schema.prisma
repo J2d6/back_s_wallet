@@ -22,6 +22,8 @@ model User {
   cash_point Boolean 
   receivers Transaction[] @relation("receive")
   senders Transaction[] @relation("send")
+  marchand Boolean @default(false)
+  wn_API_key String? 
 }
 
 model Transaction {
@@ -34,5 +36,6 @@ model Transaction {
   amount Int
   date_transaction DateTime @default(now())
   type_transaction String
+  frais_transaction Int 
 
 }

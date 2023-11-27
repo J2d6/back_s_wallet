@@ -1,4 +1,3 @@
-const { signJwtAuth } = require("../lib/jwt");
 const {getUserByEmail} = require("../lib/user")
 
 const authmiddleware = async function (req, res, next) {
@@ -6,14 +5,6 @@ const authmiddleware = async function (req, res, next) {
         const user = await getUserByEmail(req.body.email)
         if (user) {
             if (user.password === req.body.password) {
-                res.cookie("isAdmin",user.isAdmin, {
-                    maxAge: null,
-                  });
-                res.cookie("_sWallet_jwt_auth",signJwtAuth({
-                    secretKey : secretKey 
-                }), {
-                    maxAge: null,
-                })
                 res.status(200).json({
                     data : user
                 })
