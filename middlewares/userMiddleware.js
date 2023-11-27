@@ -1,5 +1,34 @@
-const { getTransactionsById } = require("../lib/transactions");
-const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers } = require("../lib/user");
+const { getTransactionsById, getTransactionTaxe, createTransaction, typeTransaction } = require("../lib/transactions");
+const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers, debiterUserWithTaxes, crediterUser } = require("../lib/user");
+
+
+const trasnfertP2PMiddleware = async function (req, res, next) {
+    try {
+        let userToTransfer = await getUSerByContact(req.body.contact_receiver);
+        if (userToTransfer) {
+            const userWhoTransfer = await getUSerByContact(req.body.contact_sender);
+            if (userWhoTransfer.soldeActuel < (+req.body.fund + getTransactionTaxe(+req.body.fund))) {
+                res.status(400).json({
+                    message : "Solde insuffisant"
+                })
+            } else {
+                await debiterUserWithTaxes(req.body.contact_sender, +req.body.fund);
+                await crediterUser(req.body.contact_receiver, +req.body.fund);
+                const transaction = await createTransaction(req.body.contact_receiver, req.body.contact_sender, typeTransaction.p2p, +req.body.fund)
+
+                res.status(200).json({
+                    data : transaction
+                })
+            }
+        } else {
+            res.status(400).json({
+                message : "Client recepteur non trouvé"
+            })
+        }
+    } catch (error) {
+        next(error)
+    }
+}
 
 
 const getTransactionsByIdMiddleware = async function (req, res, next) {
@@ -139,5 +168,6 @@ module.exports =  {
    desableUserMiddleware,
    enableUserMiddleware,
    findSimilarUsersMiddleware,
-   getTransactionsByIdMiddleware
+   getTransactionsByIdMiddleware,
+   trasnfertP2PMiddleware, 
 }
