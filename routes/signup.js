@@ -5,6 +5,6 @@ var router = express.Router();
 
 
 router.post("/sub", subscriptionMidleware);
-router.post("/sub/confirm", confirmSubscriptionMiddleware);
+router.post("/confirm", confirmSubscriptionMiddleware);
 
 module.exports = router
