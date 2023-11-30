@@ -19,7 +19,7 @@ model User {
   soldeActuel Int @default(0)
   password String
   isActive Boolean @default(true)
-  cash_point Boolean 
+  cash_point Boolean @default(false)
   receivers Transaction[] @relation("receive")
   senders Transaction[] @relation("send")
   marchand Boolean @default(false)

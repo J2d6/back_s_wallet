@@ -13,6 +13,7 @@ const userRouter = require("./routes/users")
 const adminRouter = require('./routes/admin')
 const cpRouter = require('./routes/cashPoint')
 const transactionRouter = require('./routes/transactions')
+const marchandRouter = require("./routes/marchand")
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/s_wallet.v1/user', userRouter);
 app.use('/api/s_wallet.v1/admin', adminRouter);
 app.use('/api/s_wallet.v1/cp', cpRouter); 
 app.use('/api/s_wallet.v1/transactions', transactionRouter); 
+app.use('/api/s_wallet.v1/marchand', marchandRouter); 
 
 
 // catch 404 and forward to error handler
