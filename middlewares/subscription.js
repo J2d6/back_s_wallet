@@ -1,13 +1,14 @@
 const { EMAIL_TO } = require("../config.app");
 const genererCodeConfirmation = require("../lib/generateCode");
 const { signJwt } = require("../lib/jwt");
-const { sendConfirmationCodeMail } = require("../lib/mailing");
+const { sendConfirmationCodeMail, sendMarchandKeyMail } = require("../lib/mailing");
 const { createUser, getUserByEmail } = require("../lib/user");
 
 
 const subscriptionMidleware = async function (req, res, next) { //email
     try {
-        if (getUserByEmail(req.body.email)) {
+        const client = await getUserByEmail(req.body.email);
+        if (client) {
             res.status(400).json({
                 message : "Email already used"
             })
@@ -15,9 +16,10 @@ const subscriptionMidleware = async function (req, res, next) { //email
             const codeConfirmation = genererCodeConfirmation(6);
             const dataByMail = await sendConfirmationCodeMail(req.body.email, codeConfirmation)
             console.log(dataByMail);
-            res.cookie('wn_sub',codeConfirmation)
+            // res.cookie('wn_sub',codeConfirmation)
             res.status(200).json({
-                data : "Check email"
+                data : codeConfirmation,
+                message : "Check email"
             })
         }
     } catch (error) {
@@ -27,12 +29,12 @@ const subscriptionMidleware = async function (req, res, next) { //email
 
 const confirmSubscriptionMiddleware = async function (req, res, next) { //req.body.email, 
     try {
-        if (req.cookies.wn_sub === req.body.wn_sub) {
-            if (req.body.marchand) {
+        if (req.body.CODE === req.body.wn_sub) {
+            if (req.body.marchand) { //tsmaintsy présent
                 const _wn_api_key = await signJwt({
                     email : req.body.email
                 })
-                const dataByEmail = await sendConfirmationCodeMail(req.body.email,_wn_api_key);
+                const dataByEmail = await sendMarchandKeyMail(req.body.email,_wn_api_key);
                 const user = await createUser({
                     nom : req.body.nom,
                     email : req.body.email,
@@ -41,15 +43,27 @@ const confirmSubscriptionMiddleware = async function (req, res, next) { //req.bo
                     marchand : true,
                     wn_API_key : _wn_api_key
                 });
+
                 res.status(200).json(user)
             } else {
-                const user = await createUser({
-                    nom : req.body.nom,
-                    email : req.body.email,
-                    contact : req.body.contact,
-                    password : req.body.password,
-                })
-                res.status(200).json(user)
+                if (req.body.cash_point) {
+                    const user = await createUser({
+                        nom : req.body.nom,
+                        email : req.body.email,
+                        contact : req.body.contact,
+                        password : req.body.password,
+                        cash_point : true
+                    })
+                    res.status(200).json(user)
+                } else {
+                    const user = await createUser({
+                        nom : req.body.nom,
+                        email : req.body.email,
+                        contact : req.body.contact,
+                        password : req.body.password,
+                    })
+                    res.status(200).json(user)
+                }
             }
         } else {
             res.status(400).json({
