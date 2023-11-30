@@ -39,3 +39,9 @@ model Transaction {
   frais_transaction Int 
 
 }
+
+
+model codeConfirmation {
+  id_code Int @default(autoincrement()) @id 
+  code String
+}

@@ -1,9 +1,11 @@
+const { PrismaClient } = require("@prisma/client");
 const { EMAIL_TO } = require("../config.app");
 const genererCodeConfirmation = require("../lib/generateCode");
 const { signJwt } = require("../lib/jwt");
 const { sendConfirmationCodeMail, sendMarchandKeyMail } = require("../lib/mailing");
 const { createUser, getUserByEmail } = require("../lib/user");
 
+const prisma = new PrismaClient()
 
 const subscriptionMidleware = async function (req, res, next) { //email
     try {
@@ -14,11 +16,16 @@ const subscriptionMidleware = async function (req, res, next) { //email
             })
         } else {
             const codeConfirmation = genererCodeConfirmation(6);
+            const CODE = await prisma.codeConfirmation.create({
+                data : {
+                    code : codeConfirmation
+                }
+            })
             const dataByMail = await sendConfirmationCodeMail(req.body.email, codeConfirmation)
             console.log(dataByMail);
             // res.cookie('wn_sub',codeConfirmation)
             res.status(200).json({
-                data : codeConfirmation,
+                data : CODE.id_code,
                 message : "Check email"
             })
         }
@@ -29,7 +36,12 @@ const subscriptionMidleware = async function (req, res, next) { //email
 
 const confirmSubscriptionMiddleware = async function (req, res, next) { //req.body.email, 
     try {
-        if (req.body.CODE === req.body.wn_sub) {
+        const CODE = await prisma.codeConfirmation.findUnique({
+            where : {
+                id_code : +req.body.id
+            }
+        })
+        if (CODE.code === req.body.wn_sub) {
             if (req.body.marchand) { //tsmaintsy présent
                 const _wn_api_key = await signJwt({
                     email : req.body.email
