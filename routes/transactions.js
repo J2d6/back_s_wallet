@@ -6,6 +6,4 @@ var router = express.Router();
 router.get('/', getSpecificTransactionMiddleware)
 
 
-module.exports = {
-    router
-}
+module.exports = router
