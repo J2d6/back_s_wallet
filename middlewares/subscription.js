@@ -29,6 +29,7 @@ const subscriptionMidleware = async function (req, res, next) { //email
 
 const confirmSubscriptionMiddleware = async function (req, res, next) { //req.body.email, 
     try {
+        console.log(req.body)
         if (req.body.CODE === req.body.wn_sub) {
             if (req.body.marchand) { //tsmaintsy présent
                 const _wn_api_key = await signJwt({
