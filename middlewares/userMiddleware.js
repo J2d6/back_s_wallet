@@ -1,5 +1,5 @@
 const { getTransactionsById, getTransactionTaxe, createTransaction, typeTransaction, getSpecificTransaction } = require("../lib/transactions");
-const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers, debiterUserWithTaxes, crediterUser } = require("../lib/user");
+const { getUserById, getUserByEmail, getUSerByContact, getUsers, updateUser, deleteUser, desableUser, findSimilarUsers, debiterUserWithTaxes, crediterUser, enableUser } = require("../lib/user");
 
 
 
@@ -32,8 +32,8 @@ const trasnfertP2PMiddleware = async function (req, res, next) {
             } else {
                 await debiterUserWithTaxes(req.body.contact_sender, +req.body.fund);
                 await crediterUser(req.body.contact_receiver, +req.body.fund);
-                const transaction = await createTransaction(req.body.contact_receiver, req.body.contact_sender, typeTransaction.p2p, +req.body.fund)
-
+                const transaction = await createTransaction(userToTransfer.user_id, userWhoTransfer.user_id, typeTransaction.p2p, +req.body.fund)
+console.log(transaction);
                 res.status(200).json({
                     data : transaction
                 })
