@@ -76,7 +76,53 @@ const confirmSubscriptionMiddleware = async function (req, res, next) { //req.bo
     }
 }
 
+const confirmSubscriptionMiddlewareAgent = async function (req, res, next) { //req.body.email, 
+    try {
+        console.log(req.body)
+        
+            if (req.body.marchand) { //tsmaintsy présent
+                const _wn_api_key = await signJwt({
+                    email : req.body.email
+                })
+                const dataByEmail = await sendMarchandKeyMail(req.body.email,_wn_api_key);
+                const user = await createUser({
+                    nom : req.body.nom,
+                    email : req.body.email,
+                    contact : req.body.contact,
+                    password : req.body.password,
+                    marchand : true,
+                    wn_API_key : _wn_api_key
+                });
+
+                res.status(200).json(user)
+            } else {
+                if (req.body.cash_point) {
+                    const user = await createUser({
+                        nom : req.body.nom,
+                        email : req.body.email,
+                        contact : req.body.contact,
+                        password : req.body.password,
+                        cash_point : true
+                    })
+                    res.status(200).json(user)
+                } else {
+                    const user = await createUser({
+                        nom : req.body.nom,
+                        email : req.body.email,
+                        contact : req.body.contact,
+                        password : req.body.password,
+                    })
+                    res.status(200).json(user)
+                }
+            }
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     subscriptionMidleware,
-    confirmSubscriptionMiddleware
+    confirmSubscriptionMiddleware,
+    confirmSubscriptionMiddlewareAgent
 }
